@@ -17,6 +17,9 @@ readProc :: (String -> String) -> String -> IO String
 readProc f path = do
   x <- readFile $ procPath ++ path
   return $ f x
+
+readNixVersion :: IO String
+readNixVersion = readProc id "version"
   
 readCpusInfo :: IO String
 readCpusInfo = readProc extractCpusInfo "cpuinfo"
