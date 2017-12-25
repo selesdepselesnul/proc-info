@@ -18,22 +18,24 @@ readProc :: (String -> String) -> String -> IO String
 readProc f path = 
   (readFile $ procPath ++ path) >>= return . f
 
+isMatchStr :: String -> String -> Bool
+isMatchStr x y = flip List.isInfixOf x y
+
 whereCpuInfo :: [Char] -> Bool
 whereCpuInfo x =
-  let isMatchStr =
-        flip List.isInfixOf x
+  let isMatchCpuInfo = isMatchStr x
   in
-    isMatchStr "model name"
-    || isMatchStr "vendor_id"
-    || isMatchStr "cpu MHz"
-    || isMatchStr "processor"
+    isMatchCpuInfo "model name"
+    || isMatchCpuInfo "vendor_id"
+    || isMatchCpuInfo "cpu MHz"
+    || isMatchCpuInfo "processor"
 
 extractCpuInfo :: String -> [String]
 extractCpuInfo cpuInfoStr =
-  (map
+  map
    (++ "\n")
    (filter whereCpuInfo
-          (Split.splitOn "\n" cpuInfoStr)))
+          (Split.splitOn "\n" cpuInfoStr))
   ++ ["\n"]
 
 extractCpusInfo :: String -> String
@@ -45,7 +47,25 @@ extractCpusInfo bigStr =
         $ filter
           (/= "")
           (Split.splitOn "\n\n" bigStr))
- 
+
+whereMemInfo :: String -> Bool
+whereMemInfo x =
+  let isMatchMemInfo = isMatchStr x
+  in
+    isMatchMemInfo "MemTotal"
+    || isMatchMemInfo "MemFree"
+    || isMatchMemInfo "MemAvailable"
+  
+extractMeminfo :: String -> String
+extractMeminfo x =
+  "Memory Summary\t:\n\n"
+  ++ List.intercalate
+     ""
+     (map
+       (++ "\n")
+       (filter whereMemInfo
+               (Split.splitOn "\n" x )))   
+  
 main :: IO ()
 main = do
     args <- Environment.getArgs
@@ -58,10 +78,6 @@ main = do
           case arg of
           "--cpuinfo" -> printIfSuccess $ readProc extractCpusInfo "cpuinfo"
           "--nixversion" -> printIfSuccess $ readProc id "version"
+          "--meminfo" -> printIfSuccess $ readProc extractMeminfo "meminfo"
           _ -> putStrLn "argument doesnt valid"
-
-
-
-
-
 
