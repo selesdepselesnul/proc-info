@@ -4,8 +4,8 @@ import qualified Data.List as List
 
 main :: IO ()
 main = do
-  putStrLn "hello world"
-
+  x <- readFile "/proc/cpuinfo"
+  putStrLn $ splitCpusInfo x
 
 whereCpuInfo x =
   List.isInfixOf "model name" x
@@ -14,25 +14,18 @@ whereCpuInfo x =
   || List.isInfixOf "processor" x
 
 splitCpuInfo cpuInfoStr =
-  filter whereCpuInfo
-         $ Split.splitOn "\n" cpuInfoStr
+  (map (++ "\n")
+  (filter whereCpuInfo
+          (Split.splitOn "\n" cpuInfoStr)) ) ++ ["\n"]
 
 splitCpusInfo bigStr =
-  map splitCpuInfo
+  "CPU Summary\t:\n\n" ++
+  (List.intercalate ""
+  . concat
+  . map splitCpuInfo
       $ filter
         (/= "")
-        (Split.splitOn "\n\n" bigStr)
-
-readCpuInfo = do
-  x <- readFile "/proc/cpuinfo"
-  let xs = splitCpusInfo x
-  putStrLn (show xs)
-
-
-
-
-
-
-
+        (Split.splitOn "\n\n" bigStr))
+ 
 
 
