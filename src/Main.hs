@@ -2,14 +2,15 @@ module Main where
 import qualified Data.List.Split as Split
 import qualified Data.List as List
 import qualified Control.Exception as Exception
+import qualified System.Environment as Environment
 
-main :: IO ()
-main = do
-    result <- Exception.try (readCpusInfo) :: IO (Either Exception.SomeException [Char])
-    case result of
-        Left ex  -> putStrLn $ "ups something wrong -> " ++ show ex
-        Right val -> putStrLn val
-
+printIfSuccess :: IO String -> IO ()
+printIfSuccess f = do
+  result <- Exception.try (f) :: IO (Either Exception.SomeException [Char])
+  case result of
+    Left ex  -> putStrLn $ "ups something wrong -> " ++ show ex
+    Right val -> putStrLn val
+        
 procPath :: String
 procPath = "/proc/"
 
@@ -17,12 +18,6 @@ readProc :: (String -> String) -> String -> IO String
 readProc f path = do
   x <- readFile $ procPath ++ path
   return $ f x
-
-readNixVersion :: IO String
-readNixVersion = readProc id "version"
-  
-readCpusInfo :: IO String
-readCpusInfo = readProc extractCpusInfo "cpuinfo"
 
 whereCpuInfo :: [Char] -> Bool
 whereCpuInfo x =
@@ -47,5 +42,19 @@ extractCpusInfo bigStr =
         (/= "")
         (Split.splitOn "\n\n" bigStr))
  
+main :: IO ()
+main = do
+    args <- Environment.getArgs
+    if (length args) == 0 then
+      putStrLn "please, fill the argument"
+    else
+      printProc $ head args
+    where
+      printProc arg =  
+          case arg of
+          "--cpuinfo" -> printIfSuccess $ readProc extractCpusInfo "cpuinfo"
+          "--nixversion" -> printIfSuccess $ readProc id "version"
+          _ -> putStrLn "argument doesnt valid"
+
 
 
