@@ -30,20 +30,20 @@ whereCpuInfo x =
     || isMatchCpuInfo "cpu MHz"
     || isMatchCpuInfo "processor"
 
-extractCpuInfo :: String -> [String]
-extractCpuInfo cpuInfoStr =
+extractCpusInfo :: String -> [String]
+extractCpusInfo cpuInfoStr =
   map
    (++ "\n")
    (filter whereCpuInfo
           (Split.splitOn "\n" cpuInfoStr))
   ++ ["\n"]
 
-extractCpusInfo :: String -> String
-extractCpusInfo bigStr =
+extractCpuInfo :: String -> String
+extractCpuInfo bigStr =
   "CPU Summary\t:\n\n"
   ++ (List.intercalate ""
       . concat
-      . map extractCpuInfo
+      . map extractCpusInfo
         $ filter
           (/= "")
           (Split.splitOn "\n\n" bigStr))
@@ -76,7 +76,7 @@ main = do
     where
       printProc arg =  
           case arg of
-          "--cpuinfo" -> printIfSuccess $ readProc extractCpusInfo "cpuinfo"
+          "--cpuinfo" -> printIfSuccess $ readProc extractCpuInfo "cpuinfo"
           "--nixversion" -> printIfSuccess $ readProc id "version"
           "--meminfo" -> printIfSuccess $ readProc extractMeminfo "meminfo"
           _ -> putStrLn "argument doesnt valid"
