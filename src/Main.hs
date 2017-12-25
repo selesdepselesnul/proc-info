@@ -15,9 +15,8 @@ procPath :: String
 procPath = "/proc/"
 
 readProc :: (String -> String) -> String -> IO String
-readProc f path = do
-  x <- readFile $ procPath ++ path
-  return $ f x
+readProc f path = 
+  (readFile $ procPath ++ path) >>= return . f
 
 whereCpuInfo :: [Char] -> Bool
 whereCpuInfo x =
@@ -28,19 +27,21 @@ whereCpuInfo x =
 
 extractCpuInfo :: String -> [String]
 extractCpuInfo cpuInfoStr =
-  (map (++ "\n")
-  (filter whereCpuInfo
-          (Split.splitOn "\n" cpuInfoStr))) ++ ["\n"]
+  (map
+   (++ "\n")
+   (filter whereCpuInfo
+          (Split.splitOn "\n" cpuInfoStr)))
+  ++ ["\n"]
 
 extractCpusInfo :: String -> String
 extractCpusInfo bigStr =
-  "CPU Summary\t:\n\n" ++
-  (List.intercalate ""
-  . concat
-  . map extractCpuInfo
-      $ filter
-        (/= "")
-        (Split.splitOn "\n\n" bigStr))
+  "CPU Summary\t:\n\n"
+  ++ (List.intercalate ""
+      . concat
+      . map extractCpuInfo
+        $ filter
+          (/= "")
+          (Split.splitOn "\n\n" bigStr))
  
 main :: IO ()
 main = do
@@ -55,6 +56,9 @@ main = do
           "--cpuinfo" -> printIfSuccess $ readProc extractCpusInfo "cpuinfo"
           "--nixversion" -> printIfSuccess $ readProc id "version"
           _ -> putStrLn "argument doesnt valid"
+
+
+
 
 
 
