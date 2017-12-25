@@ -9,11 +9,17 @@ main = do
     case result of
         Left ex  -> putStrLn $ "ups something wrong -> " ++ show ex
         Right val -> putStrLn val
+
+procPath :: String
+procPath = "/proc/"
+
+readProc :: (String -> String) -> String -> IO String
+readProc f path = do
+  x <- readFile $ procPath ++ path
+  return $ f x
   
 readCpusInfo :: IO String
-readCpusInfo = do
-  x <- readFile "/proc/cpuinfo"
-  return $ extractCpusInfo x
+readCpusInfo = readProc extractCpusInfo "cpuinfo"
 
 whereCpuInfo :: [Char] -> Bool
 whereCpuInfo x =
