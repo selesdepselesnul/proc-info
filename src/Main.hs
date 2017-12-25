@@ -68,7 +68,18 @@ extractMeminfo x =
 
 extractLoadAvg :: String -> String
 extractLoadAvg x =
-  id x
+  let splittedLoadAvg = (Split.splitOn " " x)
+      header = ["1 minute : ",
+                "5 minute : ",
+                "10 minute : ",
+                "Curr Running Proc : ",
+                "Last Proccess ID Used : "]
+  in
+    "Load Average :\n\n"
+    ++ 
+    List.intercalate
+    "\n"
+    (zipWith (++) header splittedLoadAvg)
   
 main :: IO ()
 main = do
