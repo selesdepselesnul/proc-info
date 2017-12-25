@@ -65,6 +65,10 @@ extractMeminfo x =
        (++ "\n")
        (filter whereMemInfo
                (Split.splitOn "\n" x )))   
+
+extractLoadAvg :: String -> String
+extractLoadAvg x =
+  id x
   
 main :: IO ()
 main = do
@@ -79,5 +83,6 @@ main = do
           "--cpuinfo" -> printIfSuccess $ readProc extractCpuInfo "cpuinfo"
           "--nixversion" -> printIfSuccess $ readProc id "version"
           "--meminfo" -> printIfSuccess $ readProc extractMeminfo "meminfo"
+          "--loadavg" -> printIfSuccess $ readProc extractLoadAvg "loadavg"
           _ -> putStrLn "argument doesnt valid"
 
