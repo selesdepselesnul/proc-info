@@ -19,7 +19,7 @@ readProc f path =
   (readFile $ procPath ++ path) >>= return . f
 
 isMatchStr :: String -> String -> Bool
-isMatchStr x y = flip List.isInfixOf x y
+isMatchStr = flip List.isInfixOf 
 
 whereCpuInfo :: [Char] -> Bool
 whereCpuInfo x =
