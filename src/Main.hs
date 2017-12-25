@@ -3,9 +3,13 @@ import qualified Data.List.Split as Split
 import qualified Data.List as List
 
 main :: IO ()
-main = do
+main = 
+  readCpuInfo >>= putStrLn
+
+readCpuInfo :: IO String
+readCpuInfo = do
   x <- readFile "/proc/cpuinfo"
-  putStrLn $ splitCpusInfo x
+  return $ splitCpusInfo x
 
 whereCpuInfo :: [Char] -> Bool
 whereCpuInfo x =
@@ -18,7 +22,7 @@ splitCpuInfo :: String -> [String]
 splitCpuInfo cpuInfoStr =
   (map (++ "\n")
   (filter whereCpuInfo
-          (Split.splitOn "\n" cpuInfoStr)) ) ++ ["\n"]
+          (Split.splitOn "\n" cpuInfoStr))) ++ ["\n"]
 
 splitCpusInfo :: String -> String
 splitCpusInfo bigStr =
