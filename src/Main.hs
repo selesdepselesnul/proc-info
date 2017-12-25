@@ -1,11 +1,15 @@
 module Main where
 import qualified Data.List.Split as Split
 import qualified Data.List as List
+import qualified Control.Exception as Exception
 
 main :: IO ()
-main = 
-  readCpusInfo >>= putStrLn
-
+main = do
+    result <- Exception.try (readCpusInfo) :: IO (Either Exception.SomeException [Char])
+    case result of
+        Left ex  -> putStrLn $ "ups something wrong -> " ++ show ex
+        Right val -> putStrLn val
+  
 readCpusInfo :: IO String
 readCpusInfo = do
   x <- readFile "/proc/cpuinfo"
