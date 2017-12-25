@@ -4,12 +4,12 @@ import qualified Data.List as List
 
 main :: IO ()
 main = 
-  readCpuInfo >>= putStrLn
+  readCpusInfo >>= putStrLn
 
-readCpuInfo :: IO String
-readCpuInfo = do
+readCpusInfo :: IO String
+readCpusInfo = do
   x <- readFile "/proc/cpuinfo"
-  return $ splitCpusInfo x
+  return $ extractCpusInfo x
 
 whereCpuInfo :: [Char] -> Bool
 whereCpuInfo x =
@@ -18,18 +18,18 @@ whereCpuInfo x =
   || List.isInfixOf "cpu MHz" x
   || List.isInfixOf "processor" x
 
-splitCpuInfo :: String -> [String]
-splitCpuInfo cpuInfoStr =
+extractCpuInfo :: String -> [String]
+extractCpuInfo cpuInfoStr =
   (map (++ "\n")
   (filter whereCpuInfo
           (Split.splitOn "\n" cpuInfoStr))) ++ ["\n"]
 
-splitCpusInfo :: String -> String
-splitCpusInfo bigStr =
+extractCpusInfo :: String -> String
+extractCpusInfo bigStr =
   "CPU Summary\t:\n\n" ++
   (List.intercalate ""
   . concat
-  . map splitCpuInfo
+  . map extractCpuInfo
       $ filter
         (/= "")
         (Split.splitOn "\n\n" bigStr))
