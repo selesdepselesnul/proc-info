@@ -20,10 +20,13 @@ readProc f path =
 
 whereCpuInfo :: [Char] -> Bool
 whereCpuInfo x =
-  List.isInfixOf "model name" x
-  || List.isInfixOf "vendor_id" x
-  || List.isInfixOf "cpu MHz" x
-  || List.isInfixOf "processor" x
+  let isMatchStr =
+        flip List.isInfixOf x
+  in
+    isMatchStr "model name"
+    || isMatchStr "vendor_id"
+    || isMatchStr "cpu MHz"
+    || isMatchStr "processor"
 
 extractCpuInfo :: String -> [String]
 extractCpuInfo cpuInfoStr =
