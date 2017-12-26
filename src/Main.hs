@@ -84,7 +84,7 @@ extractLoadAvg x =
 main :: IO ()
 main = do
     args <- Environment.getArgs
-    if (length args) == 0 then
+    if length args == 0 then
       putStrLn "please, fill the argument"
     else
       printProc $ head args
@@ -96,4 +96,6 @@ main = do
           "--meminfo" -> printIfSuccess $ readProc extractMeminfo "meminfo"
           "--loadavg" -> printIfSuccess $ readProc extractLoadAvg "loadavg"
           _ -> putStrLn "argument doesnt valid"
+
+
 
